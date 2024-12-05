@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1033939238964",
+    "project_id": "chakravyuh-maze-king",
+    "storage_bucket": "chakravyuh-maze-king.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1033939238964:android:ee8e462c9ab174b6e58a61",
+        "android_client_info": {
+          "package_name": "com.chakravyuh.mazeking"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCGPnaH-jdaVECtGMfskdRl_FW1WMp5mYI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
