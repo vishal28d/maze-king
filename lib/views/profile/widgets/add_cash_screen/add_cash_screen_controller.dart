@@ -70,17 +70,13 @@ class AddCashScreenController extends GetxController {
 
   initApiCall() async {
     WalletModel? walletModel = await WalletRepository.getWalletDetailsAPI(isLoader: isLoader, walletType: WalletType.addCash);
-    if (walletModel != null) {
-      minCashDepositAmount.value = double.tryParse(walletModel.minDepositAmount.toString()) ?? 50;
-      maxCashDepositAmount.value = double.tryParse(walletModel.maxDepositAmount.toString()) ?? 500000;
-    }
-    if (walletModel == null) {
-      Get.back();
-    } else if (!(walletModel.profileVerified ?? false)) {
-      String msg = "Please complete profile details first from My Info & Settings";
-      Get.back();
-      UiUtils.toast(msg, toastLength: Toast.LENGTH_LONG);
-    }
+    minCashDepositAmount.value = double.tryParse(walletModel!.minDepositAmount.toString()) ?? 50;
+    maxCashDepositAmount.value = double.tryParse(walletModel.maxDepositAmount.toString()) ?? 500000;
+      if (!(walletModel.profileVerified ?? false)) {
+    String msg = "Please complete profile details first from My Info & Settings";
+    Get.back();
+    UiUtils.toast(msg, toastLength: Toast.LENGTH_LONG);
+  }
   }
 
   @override

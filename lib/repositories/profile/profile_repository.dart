@@ -222,7 +222,7 @@ class ProfileRepository {
       return dio.MultipartFile.fromFile(
         imagePath,
         filename: imagePath.split("/").last, // Extract filename
-        contentType: dio.DioMediaType.parse(mediaType) as dio.DioMediaType, // Ensure correct media type
+        contentType: dio.DioMediaType.parse(mediaType), // Ensure correct media type
       );
     } catch (e) {
       if (kDebugMode) {

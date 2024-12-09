@@ -145,137 +145,98 @@ class AppContestWidgets {
 
   /// TODO
   static Widget freePracticeContest(
-    BuildContext context, {
-    String? buttonName = "PLAY",
-    required Function() onButtonTap,
-    required Function() onTapOfContest,
-  }) {
-    return GestureDetector(
-      onTap: onTapOfContest,
+  BuildContext context, {
+  String? buttonName = "PLAY",
+  required Function() onButtonTap,
+  required Function() onTapOfContest,
+}) {
+  return GestureDetector(
+    onTap: onTapOfContest,
+    child: Container(
+      height: 90,
+      margin: const EdgeInsets.only(bottom: contestPadding),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(defaultRadius),
+        color: Theme.of(context).cardColor,
+      ),
       child: Container(
-        margin: const EdgeInsets.only(bottom: contestPadding),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(defaultRadius),
-          color: Theme.of(context).cardColor,
-        ),
-        child: Container(
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(defaultRadius),
-            gradient: LinearGradient(
-                colors: [
-                  Theme.of(context).colorScheme.tertiary.withOpacity(0.9),
-                  Theme.of(context).colorScheme.secondary.withOpacity(0.2),
-                ],
-                begin: Alignment.centerLeft,
-                end: Alignment.centerRight,
-                stops: const [0.3, .7]),
-            image: DecorationImage(
-                image: AssetImage(AppAssets.authBgPNG),
-                fit: BoxFit.cover,
-                colorFilter: const ColorFilter.srgbToLinearGamma(),
-                opacity: 0.7),
+          gradient: LinearGradient(
+            colors: [
+              Theme.of(context).colorScheme.tertiary.withOpacity(0.9),
+              Theme.of(context).colorScheme.secondary.withOpacity(0.2),
+            ],
+            begin: Alignment.centerLeft,
+            end: Alignment.centerRight,
+            stops: const [0.3, 0.7],
           ),
-          child: Stack(
-            alignment: Alignment.center,
-            children: [
-              Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Container(
-                        // width: Get.width * 0.8,
-                        padding: const EdgeInsets.only(
-                            top: contestPadding, left: contestPadding),
-                        // color: Colors.blue,
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisAlignment: MainAxisAlignment.end,
-                          children: [
-                            Text(
-                              "PRACTICE GAME",
-                              style:
-                              Theme.of(context).textTheme.titleLarge?.copyWith(
-                                fontSize: 13.sp,
-                                color: Theme.of(context)
-                                    .cardColor
-                                    .withOpacity(0.8),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                  Container(
-                    // color: Colors.red,
-                    padding: const EdgeInsets.only(
-                        left: contestPadding, right: contestPadding, top: 0),
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.end,
-                      children: [
-                        ...[
-                          SvgPicture.asset(
-                            AppAssets.inrGraphicSVG,
-                            height: 21.sp,
-                          ),
-                          Padding(
-                            padding:
-                            const EdgeInsets.only(left: defaultPadding / 2),
-                            child: Text(
-                              "FREE",
-                              style:
-                              Theme.of(context).textTheme.titleLarge?.copyWith(
-                                fontWeight: FontWeight.w700,
-                                fontSize: 18.sp,
-                                color: Theme.of(context).cardColor,
-                              ),
-                            ),
-                          ),
-                        ],
-
-                        const Spacer(),
-
-                        /// Play Button
-                        AppButton(
-                          width: Get.width * 0.18,
-                          height: Get.width * 0.075,
-                          onPressed: onButtonTap,
-                          title: buttonName,
-                          titleStyle: Theme.of(context)
-                              .textTheme
-                              .titleMedium
-                              ?.copyWith(
-                              fontWeight: FontWeight.w600, fontSize: 12.sp),
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(
-                    height: (contestPadding),
-                  ),
-
-                ],
+          image: DecorationImage(
+            image: AssetImage(AppAssets.authBgPNG),
+            fit: BoxFit.cover,
+            colorFilter: const ColorFilter.srgbToLinearGamma(),
+            opacity: 0.7,
+          ),
+        ),
+        child: Stack(
+          alignment: Alignment.center,
+          children: [
+            /// Brain Image at the center
+            Padding(
+              padding: const EdgeInsets.only(left: 0),
+              child: Image.network(
+                "https://gotilo-maze-king.s3.ap-south-1.amazonaws.com/brainfree.png",
+                height: 140.0,
+                width: 140.0,
+                fit: BoxFit.cover,
               ),
-              Align(
-                alignment: Alignment.center,
-                child: Image.network(
-                  "https://gotilo-maze-king.s3.ap-south-1.amazonaws.com/brainfree.png", // The URL of your brain network image
-                  height: 75.0, // Adjust the height as needed
-                  width: 75.0,  // Adjust the width as needed
-                  fit: BoxFit.cover, // Makes sure the image scales nicely
+            ),
+
+            /// Practice Game text and Play button at the bottom
+            Align(
+              alignment: Alignment.bottomCenter,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: contestPadding ,
+                  vertical: contestPadding+1 ,  
+                ),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    /// Practice Game text
+                    Text(
+                      "PRACTICE GAME",
+                      style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                            fontSize: 15.sp,
+                            fontWeight: FontWeight.bold,
+                            color: Theme.of(context).cardColor.withOpacity(0.8),
+                          ),
+                    ),
+                    const Spacer(),
+
+                    /// Play Button
+                    AppButton(
+                      width: Get.width * 0.18,
+                      height: Get.width * 0.075,
+                      onPressed: onButtonTap,
+                      title: buttonName,
+                      titleStyle: Theme.of(context)
+                          .textTheme
+                          .titleMedium
+                          ?.copyWith(
+                              fontWeight: FontWeight.w600, fontSize: 12.sp),
+                    ),
+                  ],
                 ),
               ),
-            ],
-
-          ),
+            ),
+          ],
         ),
-
       ),
+    ),
+  );
+}
 
-    );
-  }
 
   /// ***********************************************************************************
   ///                                    UPCOMING CONTEST
@@ -297,7 +258,7 @@ class AppContestWidgets {
     required int filledSpots,
     required int remainingSpots,
     String? buttonName = "JOIN",
-    bool? isPinned ,
+    bool? isPinned,
     String? contestTitle,
     String? contestImage,
     String? brainImage,
@@ -328,7 +289,6 @@ class AppContestWidgets {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [
-
                     Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -377,21 +337,11 @@ class AppContestWidgets {
                                             fontSize: 12.sp,
                                             color: Theme.of(context).cardColor),
                                   ),
-
-
-
-
                                 ],
-
                               ),
-
                             ),
-
-
-
                           ],
                         ),
-
                         const Spacer(),
                         isMyMatchContest
                             ? Container(
@@ -420,9 +370,6 @@ class AppContestWidgets {
                             : SizedBox(width: Get.width * 0.25),
                       ],
                     ),
-
-
-
                     Container(
                       padding: EdgeInsets.only(
                           left: contestPadding,
@@ -433,7 +380,6 @@ class AppContestWidgets {
                         children: [
                           pricePoolWidget(context, pricePool: pricePool),
                           const Spacer(),
-
                           AppButton(
                             width: Get.width * 0.18,
                             height: Get.width * 0.075,
@@ -451,7 +397,6 @@ class AppContestWidgets {
                         ],
                       ),
                     ),
-
                     Padding(
                       padding: const EdgeInsets.symmetric(
                           horizontal: contestPadding, vertical: contestPadding),
@@ -500,7 +445,9 @@ class AppContestWidgets {
 
         if (brainImage != null)
           Positioned(
-            top: isPinned == true ? 60.0 : 20.0, // Adjusts vertical alignment based on `isPinned`
+            top: isPinned == true
+                ? 60.0
+                : 20.0, // Adjusts vertical alignment based on `isPinned`
             left: 0,
             right: 0, // Center horizontally
             child: Align(
@@ -564,16 +511,19 @@ class AppContestWidgets {
                 ),
                 child: contestImage != null
                     ? Padding(
-                  padding: const EdgeInsets.all(5.0), // Add padding around the image
-                  child: ClipOval(
-                    child: Image.network(
-                      contestImage,
-                      height: 30,
-                      width: 30,  // Ensure the width is the same as the height to maintain the circular shape
-                      fit: BoxFit.cover,  // Cover ensures the image fits within the circular shape
-                    ),
-                  ),
-                )
+                        padding: const EdgeInsets.all(
+                            5.0), // Add padding around the image
+                        child: ClipOval(
+                          child: Image.network(
+                            contestImage,
+                            height: 30,
+                            width:
+                                30, // Ensure the width is the same as the height to maintain the circular shape
+                            fit: BoxFit
+                                .cover, // Cover ensures the image fits within the circular shape
+                          ),
+                        ),
+                      )
                     : Image.asset(
                         AppAssets.demoPinContest,
                         height: 30,

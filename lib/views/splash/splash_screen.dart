@@ -10,6 +10,10 @@ class SplashScreen extends StatelessWidget {
 
   final SplashController con = Get.put(SplashController());
 
+  void initState(){
+    
+  }
+
   @override
   Widget build(BuildContext context) {
     return AuthBackgroundWidget(

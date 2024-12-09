@@ -216,23 +216,21 @@ abstract class NotificationService {
 
         GameDetailsModel? gameDetailsModel = await GameRepository.getGameDetailsAPI(contestId: contestId, recurringId: '', isJoined: false);
 
-        if (gameDetailsModel != null) {
-          if (Get.currentRoute == AppRoutes.gameCountdownScreen) {
-            Get.back();
-          }
-
-          if (!isValEmpty(LocalStorage.accessToken.value) && Get.currentRoute != AppRoutes.gameCountdownScreen && Get.currentRoute != AppRoutes.gameViewScreen) {
-            Get.toNamed(
-              AppRoutes.contestDetailsScreen,
-              arguments: {
-                "contestDetailsType": ContestDetailsType.unJoined,
-                "contestId": contestId,
-                "recurringId": gameDetailsModel.recurringId,
-              },
-            );
-          }
+        if (Get.currentRoute == AppRoutes.gameCountdownScreen) {
+          Get.back();
         }
-      }
+
+        if (!isValEmpty(LocalStorage.accessToken.value) && Get.currentRoute != AppRoutes.gameCountdownScreen && Get.currentRoute != AppRoutes.gameViewScreen) {
+          Get.toNamed(
+            AppRoutes.contestDetailsScreen,
+            arguments: {
+              "contestDetailsType": ContestDetailsType.unJoined,
+              "contestId": contestId,
+              "recurringId": gameDetailsModel!.recurringId,
+            },
+          );
+        }
+            }
 
       /// ----------------------------------- OTHER --------------------------------------
     } catch (e) {

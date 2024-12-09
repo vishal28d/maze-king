@@ -1,5 +1,4 @@
 import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -9,7 +8,6 @@ import 'package:maze_king/res/empty_element.dart';
 import 'package:maze_king/res/widgets/app_bar.dart';
 import 'package:maze_king/res/widgets/app_dialog.dart';
 import 'package:maze_king/res/widgets/contest_widgets.dart';
-
 import '../../repositories/contest/contest_repository.dart';
 import '../../res/widgets/pull_to_refresh_indicator.dart';
 import '../../res/widgets/scaffold_widget.dart';
@@ -24,25 +22,24 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Obx(() {
-      // Sort the upcoming contests list by pin_to_top
+      // Calculate the count of non-pinned contests
+      int nonPinnedContestsCount = homeCon.upcomingContests
+          .where((contest) => contest.pin_to_top == false)
+          .length;
+
+      // Sort contests to place pinned contests at the top
       final sortedContests = homeCon.upcomingContests
-          .where((contest) => contest.pin_to_top != null) // Filter out contests where pin_to_top is null
+          .where((contest) => contest.pin_to_top != null)
           .toList()
         ..sort((a, b) {
-          // Check if both contests are pinned to the top
           if (a.pin_to_top == true && b.pin_to_top == true) {
-            // If both are pinned, sort by top_position
-            // return a.top_position!.compareTo(b.top_position as num);
             return (a.top_position ?? 0).compareTo(b.top_position ?? 0);
           } else if (a.pin_to_top == true) {
-            // If only 'a' is pinned, it should come first
-            return -1; // 'a' should be before 'b'
+            return -1; // Pin to top moves to the top
           } else if (b.pin_to_top == true) {
-            // If only 'b' is pinned, it should come first
-            return 1; // 'b' should be after 'a'
+            return 1; // Pin to top moves to the top
           } else {
-            // If neither is pinned, maintain original order (or use another criteria if needed)
-            return 0;
+            return 0; // No change in order for non-pinned contests
           }
         });
 
@@ -107,164 +104,117 @@ class HomeScreen extends StatelessWidget {
                 ),
               ),
 
-              /// Contests
+              /// Contests Section
               Expanded(
                 child: PullToRefreshIndicator(
-                  onRefresh: () {
-                    return homeCon.getContestsAPICall(isPullToRefresh: true);
-                  },
+                  onRefresh: () => homeCon.getContestsAPICall(isPullToRefresh: true),
                   child: homeCon.isLoading.isFalse
                       ? ListView(
-                    padding: EdgeInsets.zero,
-                    controller: homeCon.scrollController,
-                    physics: const AlwaysScrollableScrollPhysics(),
-                    children: [
-                      homeCon.upcomingContests.isNotEmpty
-                          ? ListView.builder(
-                        physics:
-                        const NeverScrollableScrollPhysics(),
-                        shrinkWrap: true,
-                        itemCount: homeCon.upcomingContests.length,
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: defaultPadding,
-                          vertical: defaultPadding,
-                        ).copyWith(top: 0),
-                        itemBuilder: (context, index) {
-                          return Obx(() {
-                            return Column(
-                              children: [
-                                /// Contest
-                                index == 0
-                                    ? AppContestWidgets
-                                    .freePracticeContest(
-                                  context,
-                                  onButtonTap: () async {
-                                    deleteGameViewController();
-                                    Get.toNamed(
-                                      AppRoutes.gameViewScreen,
-                                      arguments: {
-                                        "isFreePracticeMode":
-                                        true,
-                                      },
-                                    )?.whenComplete(() =>
-                                        homeCon.getContestsAPICall(
-                                            isPullToRefresh:
-                                            true));
-                                  },
-                                  onTapOfContest: () {},
-                                )
-                                    : AppContestWidgets
-                                    .upcomingContest(
-                                  context,
-                                  isMyMatchContest: false,
-                                  pricePoolName:
-                                  AppStrings.pricePool,
-                                  pricePool: sortedContests[
-                                  index-1]
-                                      .maxPricePool,
-                                  brainImage: sortedContests[index-1].brainImage,
-                                  entryFee: sortedContests[
-                                  index-1]
-                                      .entryFee,
-                                  startTime: sortedContests[
-                                  index-1]
-                                      .startTime,
-                                  contestTitle: sortedContests[
-                                  index-1]
-                                      .contest_title,
-                                  contestImage: sortedContests[
-                                  index-1]
-                                      .contest_image,
-                                  remainingTime: index <= homeCon.timerList.length
-                                      ? homeCon.timerList[index]
-                                      : "Wait",
-                                  totalSpots: sortedContests[
-                                  index-1]
-                                      .totalSpots,
-                                  filledSpots: sortedContests[
-                                  index-1]
-                                      .totalSpots -
-                                      sortedContests[index-1]
-                                          .availableSpots,
-                                  isPinned: sortedContests[index-1].pin_to_top,
-                                  remainingSpots:
-                                  sortedContests[index-1]
-                                      .availableSpots,
-                                  onButtonTap: () async {
-                                    if (homeCon.debounceTimer
-                                        ?.isActive ??
-                                        false) {
-                                      homeCon.debounceTimer
-                                          ?.cancel();
-                                    }
-                                    homeCon.debounceTimer =
-                                        Timer(
-                                          homeCon.debounceDuration,
+                          padding: EdgeInsets.zero,
+                          controller: homeCon.scrollController,
+                          physics: const AlwaysScrollableScrollPhysics(),
+                          children: [
+                            /// Contest List
+                            sortedContests.isNotEmpty
+                                ? ListView.builder(
+                                    physics: const NeverScrollableScrollPhysics(),
+                                    shrinkWrap: true,
+                                    itemCount: sortedContests.length + 1,
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: defaultPadding,
+                                      vertical: defaultPadding,
+                                    ).copyWith(top: 0),
+                                    itemBuilder: (context, index) {
+                                      if (index == 0) {
+                                        return AppContestWidgets.freePracticeContest(
+                                          context,
+                                          onButtonTap: () async {
+                                            deleteGameViewController();
+                                            Get.toNamed(
+                                              AppRoutes.gameViewScreen,
+                                              arguments: {
+                                                "isFreePracticeMode": true,
+                                              },
+                                            )?.whenComplete(() =>
+                                                homeCon.getContestsAPICall(
+                                                  isPullToRefresh: true,
+                                                ));
+                                          },
+                                          onTapOfContest: () {},
+                                        );
+                                      } else {
+                                        final contest = sortedContests[(index - 1)];
+
+                                        // Show only free contest for "JohnSmith"
+                                        if (LocalStorage.userName == "JohnSmith" &&
+                                            index > 1) {
+                                          return const SizedBox.shrink();
+                                        }
+
+                                        return AppContestWidgets.upcomingContest(
+                                          context,
+                                          isMyMatchContest: false,
+                                          pricePoolName: AppStrings.pricePool,
+                                          pricePool: contest.maxPricePool,
+                                          brainImage: contest.brainImage,
+                                          entryFee: contest.entryFee,
+                                          startTime: contest.startTime,
+                                          contestTitle: contest.contest_title,
+                                          contestImage: contest.contest_image,
+                                          remainingTime: index <=
+                                                  homeCon.timerList.length
+                                              ? homeCon.timerList[(index + nonPinnedContestsCount)% sortedContests.length]
+                                              : "Wait",
+                                          totalSpots: contest.totalSpots,
+                                          filledSpots: contest.totalSpots -
+                                              contest.availableSpots,
+                                          isPinned: contest.pin_to_top,
+                                          remainingSpots: contest.availableSpots,
+                                          onButtonTap: () async {
+                                            if (homeCon.debounceTimer?.isActive ??
+                                                false) {
+                                              homeCon.debounceTimer?.cancel();
+                                            }
+                                            homeCon.debounceTimer = Timer(
+                                              homeCon.debounceDuration,
                                               () async {
-                                            await ContestRepository
-                                                .getJoinContestPricingDetailsAPI(
-                                              context,
-                                              contestId:
-                                              sortedContests[
-                                              index-1]
-                                                  .id
-                                                  .toString(),
-                                              recurringId:
-                                              sortedContests[
-                                              index-1]
-                                                  .recurring
-                                                  .toString(),
-                                              entryFee:
-                                              sortedContests[
-                                              index-1]
-                                                  .entryFee,
-                                              isNavFromDescScreen:
-                                              false,
+                                                await ContestRepository
+                                                    .getJoinContestPricingDetailsAPI(
+                                                  context,
+                                                  contestId:
+                                                      contest.id.toString(),
+                                                  recurringId:
+                                                      contest.recurring.toString(),
+                                                  entryFee: contest.entryFee,
+                                                  isNavFromDescScreen: false,
+                                                );
+                                              },
+                                            );
+                                          },
+                                          onTapOfContest: () {
+                                            Get.toNamed(
+                                              AppRoutes.contestDetailsScreen,
+                                              arguments: {
+                                                "contestDetailsType":
+                                                    ContestDetailsType.unJoined,
+                                                "contestId":
+                                                    contest.id.toString(),
+                                                "recurringId":
+                                                    contest.recurring.toString(),
+                                              },
                                             );
                                           },
                                         );
-                                  },
-                                  onTapOfContest: () {
-                                    Get.toNamed(
-                                      AppRoutes
-                                          .contestDetailsScreen,
-                                      arguments: {
-                                        "contestDetailsType":
-                                        ContestDetailsType
-                                            .unJoined,
-                                        "contestId":
-                                        sortedContests[
-                                        index-1]
-                                            .id
-                                            .toString(),
-                                        "recurringId":
-                                        sortedContests[
-                                        index-1]
-                                            .recurring
-                                            .toString(),
-                                      },
-                                    );
-                                  },
-                                ),
-
-                                /// Pagination Loader
-                                if (homeCon.paginationLoading.value &&
-                                    sortedContests.length ==
-                                        index + 1)
-                                  UiUtils
-                                      .appCircularProgressIndicator(),
-                              ],
-                            );
-                          });
-                        },
-                      )
-                          : EmptyElement(
-                        padding: EdgeInsets.symmetric(
-                            vertical: Get.height / 3.5),
-                        title: "Contests Not Found",
-                      ),
-                    ],
-                  )
+                                      }
+                                    },
+                                  )
+                                : EmptyElement(
+                                    padding: EdgeInsets.symmetric(
+                                        vertical: Get.height / 3.5),
+                                    title: "Contests Not Found",
+                                  ),
+                          ],
+                        )
                       : UiUtils.appCircularProgressIndicator(),
                 ),
               ),
@@ -275,8 +225,7 @@ class HomeScreen extends StatelessWidget {
     });
   }
 
-
-
+  /// Custom Text Button
   Widget customTextButton(
     BuildContext context, {
     required String title,
@@ -288,7 +237,6 @@ class HomeScreen extends StatelessWidget {
     FontWeight? fontWeight,
     EdgeInsets? padding,
     String? suffixSvg,
-    /*required Function() onTap,*/
   }) {
     return GestureDetector(
       onTap: !disable
@@ -299,11 +247,11 @@ class HomeScreen extends StatelessWidget {
               homeCon.debounceTimer = Timer(
                 homeCon.debounceDurationOfInstructions,
                 () async {
-                  /// ACTION
                   AppDialogs.videoInstructionDialogueFunction(
-                      title: title,
-                      assetVideoPath: assetVideoPath,
-                      loader: loader);
+                    title: title,
+                    assetVideoPath: assetVideoPath,
+                    loader: loader,
+                  );
                 },
               );
             }
@@ -313,9 +261,10 @@ class HomeScreen extends StatelessWidget {
             const EdgeInsets.symmetric(
                 horizontal: defaultPadding, vertical: defaultPadding / 3),
         decoration: BoxDecoration(
-            gradient: bgColor == null ? appButtonLinearGradient : null,
-            color: bgColor,
-            borderRadius: BorderRadius.circular(defaultRadius * 10)),
+          gradient: bgColor == null ? appButtonLinearGradient : null,
+          color: bgColor,
+          borderRadius: BorderRadius.circular(defaultRadius * 10),
+        ),
         child: loader.isFalse
             ? Row(
                 children: [
@@ -323,21 +272,20 @@ class HomeScreen extends StatelessWidget {
                     title,
                     style: Theme.of(context).textTheme.titleSmall?.copyWith(
                           color: AppColors.getColorOnBackground(
-                                  Theme.of(context).primaryColor)
-                              .withOpacity(1),
+                              Theme.of(context).primaryColor),
                           fontSize: fontSize,
                         ),
                   ),
-                  if (!isValEmpty(suffixSvg))
+                  if (suffixSvg != null)
                     Padding(
                       padding: const EdgeInsets.only(left: defaultPadding / 5),
                       child: SvgPicture.asset(
-                        suffixSvg!,
+                        suffixSvg,
                         colorFilter: AppColors.iconColorFilter(context,
                             color: Colors.white),
                         width: 11.sp,
                       ),
-                    )
+                    ),
                 ],
               )
             : Padding(
@@ -352,51 +300,6 @@ class HomeScreen extends StatelessWidget {
                   ),
                 ),
               ),
-      ),
-    );
-  }
-
-  Widget customInstructionButton(
-    BuildContext context, {
-    required String title,
-    required String assetVideoPath,
-    required RxBool loader,
-    required bool disable,
-    /*required Function() onTap,*/
-  }) {
-    return Container(
-      margin: const EdgeInsets.only(
-          right: defaultPadding,
-          top: defaultPadding / 4,
-          bottom: defaultPadding / 4),
-      child: TextButton(
-        onPressed: loader.isFalse && !disable
-            ? () async {
-                AppDialogs.videoInstructionDialogueFunction(
-                    title: title,
-                    assetVideoPath: assetVideoPath,
-                    loader: loader);
-              }
-            : null,
-        style: ButtonStyle(
-          backgroundColor: WidgetStateProperty.all(
-            Theme.of(context).primaryColor.withOpacity(0.05),
-          ),
-        ),
-        child: loader.isFalse
-            ? Text(
-                title,
-                style: Theme.of(context)
-                    .textTheme
-                    .titleMedium
-                    ?.copyWith(fontWeight: FontWeight.bold),
-              )
-            : SizedBox(
-                width: 20.sp,
-                height: 20.sp,
-                child: const CircularProgressIndicator(
-                  strokeWidth: 3,
-                )),
       ),
     );
   }

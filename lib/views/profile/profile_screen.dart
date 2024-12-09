@@ -46,7 +46,7 @@ class ProfileScreen extends StatelessWidget {
                         color: AppColors.authSubTitle.withOpacity(0.4),
                       ),
                     ),
-                    child: Column(
+                    child: LocalStorage.userName != "JohnSmith" ?  Column(
                       children: [
                         GestureDetector(
                           onTap: () {
@@ -93,7 +93,7 @@ class ProfileScreen extends StatelessWidget {
                                 loader: con.isWithdrawButtonLoading,
                                 onPressed: () async {
                                   WalletModel? walletModel = await WalletRepository.getWalletDetailsAPI(isLoader: con.isWithdrawButtonLoading);
-                                  if (walletModel != null && walletModel.accountDetails?.accountNumber != null && (walletModel.panCardVerify ?? false) && (walletModel.profileVerified ?? false)) {
+                                  if (walletModel?.accountDetails?.accountNumber != null && (walletModel?.panCardVerify ?? false) && (walletModel?.profileVerified ?? false)) {
                                     Get.toNamed(AppRoutes.withdrawScreen);
                                   } else {
                                     bool bankVerified = walletModel?.bankVerified ?? false;
@@ -123,19 +123,20 @@ class ProfileScreen extends StatelessWidget {
                                   initApiCall() async {
                                     WalletModel? walletModel = await WalletRepository.getWalletDetailsAPI(isLoader: con.addCashLoader);
                                     // await Future.delayed(const Duration(seconds: 2));
-                                    if (walletModel != null && (walletModel.profileVerified ?? false)) {
+                                    if ((walletModel?.profileVerified ?? false)) {
                                       Get.toNamed(
                                         AppRoutes.addCashScreen,
                                         arguments: {
                                           'money': "100",
                                         },
                                       );
-                                    } else if (walletModel == null) {
-                                      UiUtils.toast("Please try later");
-                                    } else {
-                                      String msg = "Please complete profile details first from My Info & Settings";
-                                      UiUtils.toast(msg);
-                                    }
+                                    } else 
+                                    {
+                                    String msg = "Please complete profile details first from My Info & Settings";
+                                    UiUtils.toast(msg);
+
+                                    }                                   
+                                  
                                   }
 
                                   initApiCall();
@@ -145,7 +146,8 @@ class ProfileScreen extends StatelessWidget {
                           ],
                         )
                       ],
-                    ),
+                    ) : const SizedBox( height: 20,) ,
+                    
                   ),
                   15.verticalSpace,
                   detailTile(

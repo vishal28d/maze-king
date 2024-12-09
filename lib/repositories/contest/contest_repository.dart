@@ -24,7 +24,7 @@ class ContestRepository {
   static Future<RxList<UpcomingContestModel>?> getUpcomingContestsAPI({
     bool isInitial = true,
     bool isPullToRefresh = false,
-    RxBool? loader,
+    RxBool? loader,  
   }) async {
     if (isRegistered<HomeController>()) {
       final HomeController con = Get.find<HomeController>();

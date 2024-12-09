@@ -35,7 +35,7 @@ class MyMatchesScreen extends StatelessWidget {
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(10),
                 ),
-                child: MyTabBar(
+                child: LocalStorage.userName !="JohnSmith" ?  MyTabBar(
                   controller: con.tabController,
 
                   // backgroundColor: Colors.red,
@@ -50,7 +50,7 @@ class MyMatchesScreen extends StatelessWidget {
                       child: Text(AppStrings.completed),
                     ),
                   ],
-                ),
+                ) : const SizedBox()  ,
               ),
               bottomWidgetWidth: Get.width * 0.85,
             ),
