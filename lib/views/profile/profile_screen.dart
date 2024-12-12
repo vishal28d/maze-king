@@ -167,6 +167,8 @@ class ProfileScreen extends StatelessWidget {
                       Get.toNamed(AppRoutes.referAndEarnScreen);
                     },
                   ),
+
+                  if(LocalStorage.userName!="JohnSmith")
                   detailTile(
                     context,
                     title: "Bank & KYC Details",
@@ -176,6 +178,7 @@ class ProfileScreen extends StatelessWidget {
                       Get.toNamed(AppRoutes.kycDetailScreen);
                     },
                   ),
+                  
                   15.verticalSpace,
                   detailTile(
                     context,

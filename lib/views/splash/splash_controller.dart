@@ -35,7 +35,7 @@ class SplashController extends GetxController {
   // Fetch available app versions from API
   Future<List<VersionModel>> fetchVersions() async {
     try {
-      final response = await http.get(
+      final response = await http.post(
         Uri.parse('https://devapi.gotilo.app/v1/version/create'),
       );
 

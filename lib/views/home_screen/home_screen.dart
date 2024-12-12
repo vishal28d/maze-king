@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 import 'package:maze_king/exports.dart';
 import 'package:maze_king/res/empty_element.dart';
 import 'package:maze_king/res/widgets/app_bar.dart';
@@ -14,10 +15,71 @@ import '../../res/widgets/scaffold_widget.dart';
 import '../contest_details/contest_details_controller.dart';
 import 'home_controller.dart';
 
-class HomeScreen extends StatelessWidget {
-  HomeScreen({super.key});
+class HomeScreen extends StatefulWidget {
+  const HomeScreen({super.key});
 
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
   final HomeController homeCon = Get.put(HomeController());
+
+  late String displayTime;
+  Timer? timer;
+
+   @override
+  void initState() {
+    super.initState();
+  
+    // Start the timer to update the display every minute
+    timer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      setState(() {
+       
+      });
+    });
+  }
+
+   @override
+  void dispose() {
+    timer?.cancel();  
+    super.dispose();
+  }
+
+        String convert_startDate_to_Date(String dateString) {
+            try {
+                final DateTime date = DateTime.parse(dateString); // Parse the date string
+                final DateTime now = DateTime.now(); // Get current time
+                final Duration difference = date.difference(now); // Calculate the difference
+
+                if (difference.isNegative == false) {
+                  if (difference.inDays < 1) {
+                    if (difference.inHours < 1) {
+                      // If the time left is less than 1 hour
+                      final int minutes = difference.inMinutes;
+                      final int seconds = difference.inSeconds.remainder(60); // Seconds left after minutes
+                      return '${minutes}m ${seconds}s';
+                    } else {
+                      // If the time left is less than 1 day but more than 1 hour
+                      final int hours = difference.inHours;
+                      final int minutes = difference.inMinutes.remainder(60); // Minutes left after hours
+                      return '${hours}h ${minutes}m';
+                    }
+                  } else {
+                    // If the time left is more than 1 day, format as "dd MMM"
+                    final DateFormat formatter = DateFormat('dd MMM');
+                    return formatter.format(date);
+                  }
+                } else {
+                  // Return "Invalid Date" if the date is in the past
+                  return "Invalid Date";
+                }
+              } catch (e) {
+                // Return a fallback or error message in case of invalid date
+                return "Invalid Date";
+              }
+            }
+
 
   @override
   Widget build(BuildContext context) {
@@ -42,6 +104,25 @@ class HomeScreen extends StatelessWidget {
             return 0; // No change in order for non-pinned contests
           }
         });
+
+        String calculateRemainingTime(DateTime startTime) {
+            final currentTime = DateTime.now();
+            final difference = startTime.difference(currentTime);
+
+            if (difference.isNegative) {
+              return "Started"; // If the time has already passed
+            } else {
+              final hours = difference.inHours;
+              final minutes = difference.inMinutes % 60;
+              final seconds = difference.inSeconds % 60;
+
+              // Format the remaining time as HH:MM:SS
+              return "${hours.toString().padLeft(2, '0')}:"
+                    "${minutes.toString().padLeft(2, '0')}:"
+                    "${seconds.toString().padLeft(2, '0')}";
+            }
+          }
+
 
       return AppScaffoldBgWidget(
         child: Scaffold(
@@ -79,6 +160,8 @@ class HomeScreen extends StatelessWidget {
                     ),
                     suffixSvg: AppAssets.playSVG,
                   ),
+
+                  if(LocalStorage.userName!="JohnSmith")
                   appBarActionButton(
                     svgIconPath: AppAssets.walletGraphicSVG,
                     onTap: () {
@@ -103,21 +186,24 @@ class HomeScreen extends StatelessWidget {
                   ),
                 ),
               ),
-
+     
               /// Contests Section
               Expanded(
                 child: PullToRefreshIndicator(
-                  onRefresh: () => homeCon.getContestsAPICall(isPullToRefresh: true),
+                  onRefresh: () =>
+                      homeCon.getContestsAPICall(isPullToRefresh: true),
                   child: homeCon.isLoading.isFalse
                       ? ListView(
                           padding: EdgeInsets.zero,
                           controller: homeCon.scrollController,
                           physics: const AlwaysScrollableScrollPhysics(),
                           children: [
-                            /// Contest List
+                            /// Contest List 
+                            
                             sortedContests.isNotEmpty
                                 ? ListView.builder(
-                                    physics: const NeverScrollableScrollPhysics(),
+                                    physics:
+                                        const NeverScrollableScrollPhysics(),
                                     shrinkWrap: true,
                                     itemCount: sortedContests.length + 1,
                                     padding: const EdgeInsets.symmetric(
@@ -126,7 +212,8 @@ class HomeScreen extends StatelessWidget {
                                     ).copyWith(top: 0),
                                     itemBuilder: (context, index) {
                                       if (index == 0) {
-                                        return AppContestWidgets.freePracticeContest(
+                                        return AppContestWidgets
+                                            .freePracticeContest(
                                           context,
                                           onButtonTap: () async {
                                             deleteGameViewController();
@@ -143,15 +230,19 @@ class HomeScreen extends StatelessWidget {
                                           onTapOfContest: () {},
                                         );
                                       } else {
-                                        final contest = sortedContests[(index - 1)];
+                                        final contest =
+                                            sortedContests[(index - 1)];
 
                                         // Show only free contest for "JohnSmith"
-                                        if (LocalStorage.userName == "JohnSmith" &&
+                                        if (LocalStorage.userName ==
+                                                "JohnSmith" &&
                                             index > 1) {
                                           return const SizedBox.shrink();
                                         }
-
-                                        return AppContestWidgets.upcomingContest(
+                                        
+                                         if(LocalStorage.userName!="JohnSmith") {
+                                           return AppContestWidgets
+                                            .upcomingContest(
                                           context,
                                           isMyMatchContest: false,
                                           pricePoolName: AppStrings.pricePool,
@@ -161,17 +252,23 @@ class HomeScreen extends StatelessWidget {
                                           startTime: contest.startTime,
                                           contestTitle: contest.contest_title,
                                           contestImage: contest.contest_image,
-                                          remainingTime: index <=
-                                                  homeCon.timerList.length
-                                              ? homeCon.timerList[(index + nonPinnedContestsCount)% sortedContests.length]
-                                              : "Wait",
+
+                                          // remainingTime: 
+                                          //     index <= homeCon.timerList.length
+                                          //         ? homeCon.timerList[(index)]
+                                          //         : "Wait",
+
+                                           remainingTime: convert_startDate_to_Date(contest.startTime.toIso8601String()),
+                                          
                                           totalSpots: contest.totalSpots,
                                           filledSpots: contest.totalSpots -
                                               contest.availableSpots,
                                           isPinned: contest.pin_to_top,
-                                          remainingSpots: contest.availableSpots,
+                                          remainingSpots:
+                                              contest.availableSpots,
                                           onButtonTap: () async {
-                                            if (homeCon.debounceTimer?.isActive ??
+                                            if (homeCon
+                                                    .debounceTimer?.isActive ??
                                                 false) {
                                               homeCon.debounceTimer?.cancel();
                                             }
@@ -183,8 +280,8 @@ class HomeScreen extends StatelessWidget {
                                                   context,
                                                   contestId:
                                                       contest.id.toString(),
-                                                  recurringId:
-                                                      contest.recurring.toString(),
+                                                  recurringId: contest.recurring
+                                                      .toString(),
                                                   entryFee: contest.entryFee,
                                                   isNavFromDescScreen: false,
                                                 );
@@ -199,13 +296,15 @@ class HomeScreen extends StatelessWidget {
                                                     ContestDetailsType.unJoined,
                                                 "contestId":
                                                     contest.id.toString(),
-                                                "recurringId":
-                                                    contest.recurring.toString(),
+                                                "recurringId": contest.recurring
+                                                    .toString(),
                                               },
                                             );
                                           },
                                         );
+                                         }
                                       }
+                                      return null;
                                     },
                                   )
                                 : EmptyElement(

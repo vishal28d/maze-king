@@ -12,7 +12,7 @@ class BottomNavBarController extends GetxController {
   Widget screenViewByIndex() {
     switch (selectedScreenIndex.value) {
       case 0:
-        return HomeScreen();
+        return const HomeScreen();
       case 1:
         return MyMatchesScreen();
       case 2:

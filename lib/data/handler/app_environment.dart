@@ -16,6 +16,7 @@ class AppEnvironment {
         } else {
           return "https://api.gotilo.app/v1/";
         }
+        
 
       case EnvironmentType.staging:
         if (kDebugMode) {
