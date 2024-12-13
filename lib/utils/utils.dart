@@ -334,11 +334,11 @@ Future<XFile?> _compressImage(String path) async {
     String tempPath = '${tempDir.path}/compressed_image.jpg';
 
     // Compress the image and save it in the temp directory
-    XFile? result = await FlutterImageCompress.compressAndGetFile(
+    XFile? result = (await FlutterImageCompress.compressAndGetFile(
       path,
       tempPath,
       quality: 50, // Compression quality
-    );
+    ));
 
     // Return the compressed file
     return result;

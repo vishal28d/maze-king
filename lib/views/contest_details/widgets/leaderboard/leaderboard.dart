@@ -22,7 +22,6 @@ class Leaderboard extends StatelessWidget {
   final LeaderboardController con = Get.put(LeaderboardController());
   final WinnersScreenController con2 = Get.put(WinnersScreenController());
 
-
   get showThreeColumns =>
       (mainCon.contestDetailsType.value == ContestDetailsType.completed &&
           mainCon.contestDetailsModel.value.contestStatus != null &&
@@ -30,26 +29,29 @@ class Leaderboard extends StatelessWidget {
               ContestStatus.inReview.name &&
           mainCon.contestDetailsModel.value.isRefunded != true);
 
-  
-String _getImageUrl(String username) {
-  try {
-    // Find the user in the allWinners list
-    final user = con2.allWinners.firstWhere(
-      (winner) => winner.userName == username,
-       // Return null if no match is found
-    );
-    return user.image ?? "https://via.placeholder.com/150"; 
-  } catch (e) {
-    // Handle any unexpected errors
-    return "https://via.placeholder.com/150";  
+  String _getImageUrl(String username) {
+    try {
+      // Find the user in the allWinners list
+      final user = con2.allWinners.firstWhere(
+        (winner) => winner.userName == username,
+        // Return null if no match is found
+      );
+      return user.image ??
+          "https://gotilo-maze-king.s3.ap-south-1.amazonaws.com/1731656714446_user_image.png";
+    } catch (e) {
+      // Handle any unexpected errors
+      return "https://gotilo-maze-king.s3.ap-south-1.amazonaws.com/1731656714446_user_image.png";
+    }
   }
-}
-
-
 
   @override
   Widget build(BuildContext context) {
     return Obx(() {
+
+      con.leaderboardList.sort((a, b) =>
+          (a.rank == null ? double.infinity : a.rank!)
+              .compareTo(b.rank == null ? double.infinity : b.rank!));
+
       return Column(
         children: [
           if (con.isLoading.isFalse && con.leaderboardList.isNotEmpty)
@@ -103,7 +105,7 @@ String _getImageUrl(String username) {
                                 itemBuilder: (context, index) {
                                   // if (kDebugMode) {
                                   //   print(con.leaderboardList[index].image);
-                                  // } // print image url 
+                                  // } // print image url
                                   return Container(
                                     color: con.leaderboardList[index].userId ==
                                             LocalStorage.userId.value
@@ -162,8 +164,11 @@ String _getImageUrl(String username) {
                                                         child: AppNetworkImage(
                                                           imageUrl:
                                                               // con.leaderboardList[index].image ?? "No url ",
-                                                            _getImageUrl(con.leaderboardList[index].userName.toString() ) ,
-
+                                                              _getImageUrl(con
+                                                                  .leaderboardList[
+                                                                      index]
+                                                                  .userName
+                                                                  .toString()),
                                                           fit: BoxFit.cover,
                                                           height: 40.w,
                                                           width: 40.w,
@@ -479,4 +484,3 @@ String _getImageUrl(String username) {
     );
   }
 }
-
