@@ -30,6 +30,33 @@ class MyMatchesScreen extends StatelessWidget {
               actions: const [
                 // appBarActionButton(svgIconPath: AppAssets.notificationGraphicSVG, rightPadding: 0, onTap: () {}),
                 // appBarActionButton(svgIconPath: AppAssets.walletGraphicSVG, onTap: () {}),
+                //  IconButton(onPressed: ()=> Get.to(MyMatchesScreen(), ), icon: const Icon(Icons.telegram , color: Colors.white,)) , 
+     
+                 // In some widget/button inside another screen:
+
+// ElevatedButton(
+//   onPressed: () {
+//     final BottomNavBarController navController = Get.put(BottomNavBarController());
+//     navController.selectedScreenIndex.value = 1; // Set index to My Games (1)
+
+//     // Optionally, add additional logic for refreshing the data
+//     if (isRegistered<MyMatchesController>()) {
+//       MyMatchesController matchesController = Get.find<MyMatchesController>();
+
+//       // Set the tabController to index 1 (Live tab)
+//       matchesController.tabController.index = 1;
+
+//       // Trigger live match data refresh if necessary
+//       if (isRegistered<MyLiveMatchesController>()) {
+//         MyLiveMatchesController liveMatchesController = Get.find<MyLiveMatchesController>();
+//         liveMatchesController.getContestsAPICall(isPullToRefresh: true, isLoader: liveMatchesController.isLoading);
+//       }
+//     }
+//   },
+//   child: Text('Go to My Games - Live'),
+// )
+
+
               ],
               bottomWidget: Container(
                 decoration: BoxDecoration(

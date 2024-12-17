@@ -5,7 +5,6 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:maze_king/exports.dart';
-import 'package:maze_king/res/empty_element.dart';
 import 'package:maze_king/res/widgets/app_bar.dart';
 import 'package:maze_king/res/widgets/app_dialog.dart';
 import 'package:maze_king/res/widgets/contest_widgets.dart';
@@ -39,6 +38,7 @@ class _HomeScreenState extends State<HomeScreen> {
       });
     });
   }
+
 
    @override
   void dispose() {
@@ -84,11 +84,6 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Obx(() {
-      // Calculate the count of non-pinned contests
-      int nonPinnedContestsCount = homeCon.upcomingContests
-          .where((contest) => contest.pin_to_top == false)
-          .length;
-
       // Sort contests to place pinned contests at the top
       final sortedContests = homeCon.upcomingContests
           .where((contest) => contest.pin_to_top != null)
@@ -182,6 +177,11 @@ class _HomeScreenState extends State<HomeScreen> {
                         disable: homeCon.howToPlayLoader.value ||
                             homeCon.userGuideLoader.value,
                       ),
+
+                      /// testing
+                      // IconButton(onPressed: ()=> Get.to(MyMatchesScreen()), icon: Icon(Icons.telegram , color: Colors.white,))
+
+
                     ],
                   ),
                 ),
@@ -199,9 +199,8 @@ class _HomeScreenState extends State<HomeScreen> {
                           physics: const AlwaysScrollableScrollPhysics(),
                           children: [
                             /// Contest List 
-                            
-                            sortedContests.isNotEmpty
-                                ? ListView.builder(
+                           
+                             ListView.builder(
                                     physics:
                                         const NeverScrollableScrollPhysics(),
                                     shrinkWrap: true,
@@ -307,11 +306,12 @@ class _HomeScreenState extends State<HomeScreen> {
                                       return null;
                                     },
                                   )
-                                : EmptyElement(
-                                    padding: EdgeInsets.symmetric(
-                                        vertical: Get.height / 3.5),
-                                    title: "Contests Not Found",
-                                  ),
+                                // : EmptyElement(
+                                //     padding: EdgeInsets.symmetric(
+                                //         vertical: Get.height / 3.5),
+                                //     title: "Contests Not Found",
+                                //   ),
+
                           ],
                         )
                       : UiUtils.appCircularProgressIndicator(),

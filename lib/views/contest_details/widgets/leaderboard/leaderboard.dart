@@ -47,13 +47,13 @@ class Leaderboard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Obx(() {
-
       con.leaderboardList.sort((a, b) =>
           (a.rank == null ? double.infinity : a.rank!)
               .compareTo(b.rank == null ? double.infinity : b.rank!));
 
       return Column(
         children: [
+        
           if (con.isLoading.isFalse && con.leaderboardList.isNotEmpty)
             Container(
               color: Theme.of(context).cardColor.withOpacity(0.8),

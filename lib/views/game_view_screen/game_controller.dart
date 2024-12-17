@@ -54,6 +54,7 @@ class MazeGameController extends GetxController with GetTickerProviderStateMixin
     "+917777990666",
     "+918469879296",
     "+918264612844",
+    "+917709284779"
   ];
 
   double calculateRemainingTimePercentage() {

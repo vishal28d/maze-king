@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:maze_king/views/game_view_screen/circular_countdown%20_timer.dart';
-import 'package:maze_king/views/my_matches/my_matches_screen.dart';
 
 import '../../exports.dart';
 import '../../packages/custom_pop_scope/custom_will_pop.dart';
@@ -37,16 +36,22 @@ class _MazeGameViewScreenState extends State<MazeGameViewScreen>
     });
 
     con.isGameFinished.listen((isFinished) {
-      if (isFinished) {
-        AppDialogs.dashboardCommonDialog(context,
-            dialogTitle: "Contest Completed !", descriptionChild: const Text("Your game has been finished. Please wait 3 minutes for result"));
-        Get.offAll(
-          MyMatchesScreen(),
-          arguments: {"initialIndex": 1},
+      if (isFinished && con.isFreePracticeMode == false) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text(
+                'Your game has been finished. Please wait 3 minutes for the result.'),
+            duration: Duration(seconds: 5),
+          ),
         );
-
+        // Logic to navigate to Live contest page with nav bar
+        navigateToHomePage();
       }
     });
+  }
+
+  void navigateToHomePage() {
+    Get.offAllNamed(AppRoutes.bottomNavBarScreen);
   }
 
   void willPopBackDialog() {
@@ -261,7 +266,8 @@ class _MazeGameViewScreenState extends State<MazeGameViewScreen>
                                     defaultPadding.verticalSpace,
                                     Text(
                                       // "You game has been finished. Please wait few seconds",
-                                      "Your game has been finished. Please wait 3 minutes for result",
+                                      // "Your game has been finished. Please wait 3 minutes for result",
+                                      "",
                                       textAlign: TextAlign.center,
                                       style: Theme.of(context)
                                           .textTheme
@@ -278,66 +284,70 @@ class _MazeGameViewScreenState extends State<MazeGameViewScreen>
                             : Padding(
                                 padding: const EdgeInsets.symmetric(
                                     horizontal: defaultPadding * 2),
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Image.asset(
-                                      con.isWinner.value
-                                          ? AppAssets.winnerIllustrationPNG
-                                          : AppAssets.gameOverIllustrationPNG,
-                                      width: Get.width / 1.8,
-                                    ),
-                                    Text(
-                                      "${con.isWinner.value ? 'Impressive! ' : ''}Your success rate in the practice maze indicates a ${(con.onTrackBallProgressPercentage().isEqual(100) || con.onTrackBallProgressPercentage().isGreaterThan(100) || con.isWinner.value) ? '100' : con.initialBallPosition == con.ballPosition.value ? '0' : con.onTrackBallProgressPercentage().round()}% chance of winning the contest. Join now!",
-                                      // "🎉 Congratulations on completing the practice maze game! 🎉",
-                                      textAlign: TextAlign.center,
-                                      style: Theme.of(context)
-                                          .textTheme
-                                          .titleMedium
-                                          ?.copyWith(
-                                            // color: AppColors.subTextColor(context),
-                                            fontWeight: FontWeight.w500,
+                                child: Container(
+                                  margin: const EdgeInsets.only(bottom: 240),
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    
+                                    children: [
+                                      Image.asset(
+                                        con.isWinner.value
+                                            ? AppAssets.winnerIllustrationPNG
+                                            : AppAssets.gameOverIllustrationPNG,
+                                        width: Get.width / 1.8,
+                                      ),
+                                      Text(
+                                        "${con.isWinner.value ? 'Impressive! ' : ''}Your success rate in the practice maze indicates a ${(con.onTrackBallProgressPercentage().isEqual(100) || con.onTrackBallProgressPercentage().isGreaterThan(100) || con.isWinner.value) ? '100' : con.initialBallPosition == con.ballPosition.value ? '0' : con.onTrackBallProgressPercentage().round()}% chance of winning the contest. Join now!",
+                                        // "🎉 Congratulations on completing the practice maze game! 🎉",
+                                        textAlign: TextAlign.center,
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .titleMedium
+                                            ?.copyWith(
+                                              // color: AppColors.subTextColor(context),
+                                              fontWeight: FontWeight.w500,
+                                            ),
+                                      ),
+                                      if (con.isNavFromCuntDownScreen.isFalse)
+                                        AppButton(
+                                            padding: const EdgeInsets.symmetric(
+                                                    vertical: defaultPadding)
+                                                .copyWith(
+                                                    top: defaultPadding * 2),
+                                            title: "Join Contest",
+                                            onPressed: () {
+                                              Get.back();
+                                            }),
+                                      GestureDetector(
+                                        onTap: () {
+                                          _timerKey.currentState!.resetTimer();
+                                          con.generatePracticeMazeView();
+                                        },
+                                        child: Container(
+                                          padding: EdgeInsets.symmetric(
+                                              horizontal: defaultPadding,
+                                              vertical: con
+                                                      .isNavFromCuntDownScreen
+                                                      .isFalse
+                                                  ? 0
+                                                  : defaultPadding * 2),
+                                          child: Text(
+                                            "Play Again!",
+                                            textAlign: TextAlign.center,
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .titleMedium
+                                                ?.copyWith(
+                                                  color: Theme.of(context)
+                                                      .colorScheme
+                                                      .tertiary,
+                                                  fontWeight: FontWeight.w400,
+                                                ),
                                           ),
-                                    ),
-                                    if (con.isNavFromCuntDownScreen.isFalse)
-                                      AppButton(
-                                          padding: const EdgeInsets.symmetric(
-                                                  vertical: defaultPadding)
-                                              .copyWith(
-                                                  top: defaultPadding * 2),
-                                          title: "Join Contest",
-                                          onPressed: () {
-                                            Get.back();
-                                          }),
-                                    GestureDetector(
-                                      onTap: () {
-                                        _timerKey.currentState!.resetTimer();
-                                        con.generatePracticeMazeView();
-                                      },
-                                      child: Container(
-                                        padding: EdgeInsets.symmetric(
-                                            horizontal: defaultPadding,
-                                            vertical: con
-                                                    .isNavFromCuntDownScreen
-                                                    .isFalse
-                                                ? 0
-                                                : defaultPadding * 2),
-                                        child: Text(
-                                          "Play Again!",
-                                          textAlign: TextAlign.center,
-                                          style: Theme.of(context)
-                                              .textTheme
-                                              .titleMedium
-                                              ?.copyWith(
-                                                color: Theme.of(context)
-                                                    .colorScheme
-                                                    .tertiary,
-                                                fontWeight: FontWeight.w400,
-                                              ),
                                         ),
                                       ),
-                                    ),
-                                  ],
+                                    ],
+                                  ),
                                 ),
                               )
                   ]),
