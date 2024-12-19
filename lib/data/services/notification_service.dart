@@ -3,16 +3,21 @@ import 'dart:io';
 
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:get/get.dart';
+import 'package:maze_king/views/bottombar/bottombar_controller.dart';
+import 'package:maze_king/views/my_matches/my_matches_controller.dart';
+import 'package:maze_king/views/my_matches/widgets/completed/my_completed_matches_screen.dart';
 
 import '../../exports.dart';
 import '../../repositories/game/game_repository.dart';
 import '../../views/contest_details/contest_details_controller.dart';
 import '../models/game/game_details_model.dart';
 
-FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
+FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+    FlutterLocalNotificationsPlugin();
 String deviceToken = '';
 
 abstract class NotificationService {
@@ -48,17 +53,24 @@ abstract class NotificationService {
 
   static Future getNotificationPermission() async {
     await getFCMToken();
-    await flutterLocalNotificationsPlugin.resolvePlatformSpecificImplementation<IOSFlutterLocalNotificationsPlugin>()?.requestPermissions(
+    await flutterLocalNotificationsPlugin
+        .resolvePlatformSpecificImplementation<
+            IOSFlutterLocalNotificationsPlugin>()
+        ?.requestPermissions(
           alert: true,
           badge: true,
           sound: true,
           critical: true,
         );
-    await flutterLocalNotificationsPlugin.resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>()?.createNotificationChannel(channel);
+    await flutterLocalNotificationsPlugin
+        .resolvePlatformSpecificImplementation<
+            AndroidFlutterLocalNotificationsPlugin>()
+        ?.createNotificationChannel(channel);
   }
 
   static void firebaseMessagingInit() async {
-    var initializationSettingsAndroid = const AndroidInitializationSettings('ic_notification');
+    var initializationSettingsAndroid =
+        const AndroidInitializationSettings('ic_notification');
     var initializationSettingsIOS = const DarwinInitializationSettings(
       requestSoundPermission: true,
       requestBadgePermission: true,
@@ -66,7 +78,8 @@ abstract class NotificationService {
       // defaultPresentSound: true,
       // defaultPresentAlert: true,
     );
-    var initializationSettings = InitializationSettings(android: initializationSettingsAndroid, iOS: initializationSettingsIOS);
+    var initializationSettings = InitializationSettings(
+        android: initializationSettingsAndroid, iOS: initializationSettingsIOS);
     await flutterLocalNotificationsPlugin.getNotificationAppLaunchDetails();
     flutterLocalNotificationsPlugin.initialize(
       initializationSettings,
@@ -74,21 +87,26 @@ abstract class NotificationService {
     );
   }
 
-  static Future<dynamic> onSelectNotification(NotificationResponse notificationResponse) async {
+  static Future<dynamic> onSelectNotification(
+      NotificationResponse notificationResponse) async {
     debugPrint("-=-=-=-=-=-=-> onSelectNotification <-=-=-=-=-=--=-");
-    if (notificationResponse.payload != null && notificationResponse.payload!.isNotEmpty) {
+    if (notificationResponse.payload != null &&
+        notificationResponse.payload!.isNotEmpty) {
       navigation(notificationResponse.payload);
     }
   }
 
   static void getMessage() async {
-    await FirebaseMessaging.instance.setForegroundNotificationPresentationOptions(
+    await FirebaseMessaging.instance
+        .setForegroundNotificationPresentationOptions(
       alert: true,
       badge: true,
       sound: true,
     );
     // KILL APP
-    FirebaseMessaging.instance.getInitialMessage().then((RemoteMessage? message) async {
+    FirebaseMessaging.instance
+        .getInitialMessage()
+        .then((RemoteMessage? message) async {
       printData(key: "getMessage Function", value: "Initial Get Message");
       if (message != null) {
         navigation(message.data);
@@ -147,8 +165,12 @@ abstract class NotificationService {
       presentBadge: true,
       // interruptionLevel: InterruptionLevel.critical,
     );
-    NotificationDetails platform = NotificationDetails(android: android, iOS: iOS);
-    if (remoteMessage != null && !isValEmpty(remoteMessage.notification) && !isValEmpty(remoteMessage.notification?.title) && !isValEmpty(remoteMessage.notification?.body)) {
+    NotificationDetails platform =
+        NotificationDetails(android: android, iOS: iOS);
+    if (remoteMessage != null &&
+        !isValEmpty(remoteMessage.notification) &&
+        !isValEmpty(remoteMessage.notification?.title) &&
+        !isValEmpty(remoteMessage.notification?.body)) {
       await flutterLocalNotificationsPlugin.show(
         remoteMessage.notification.hashCode,
         remoteMessage.notification?.title,
@@ -192,12 +214,15 @@ abstract class NotificationService {
 
       /// --------------- My upcoming contest => countdown screen navigation ---------------
 
-      if (payload['type'] == 'timer_screen' && !isValEmpty(payload['contest'])) {
+      if (payload['type'] == 'timer_screen' &&
+          !isValEmpty(payload['contest'])) {
         String contestId = payload['contest'] ?? "";
         String recurringId = payload['recurring'] ?? "";
 
         // final MyUpcomingContestModel model = MyUpcomingContestModel.fromJson(data);
-        if (!isValEmpty(LocalStorage.accessToken.value) && Get.currentRoute != AppRoutes.gameCountdownScreen && Get.currentRoute != AppRoutes.gameViewScreen) {
+        if (!isValEmpty(LocalStorage.accessToken.value) &&
+            Get.currentRoute != AppRoutes.gameCountdownScreen &&
+            Get.currentRoute != AppRoutes.gameViewScreen) {
           Get.toNamed(
             AppRoutes.gameCountdownScreen,
             arguments: {
@@ -209,18 +234,34 @@ abstract class NotificationService {
         }
       }
 
+      /// --------------- Navigate to Leaderboard when results are created ---------------
+      if (payload['type'] == 'result' && !isValEmpty(payload['contest'])) {
+        String contestId = payload['contest'] ?? "";
+        String recurringId = payload['recurring'] ?? "";
+
+        if (!isValEmpty(LocalStorage.accessToken.value) &&
+            Get.currentRoute != AppRoutes.bottomNavBarScreen) {
+                navigateToCompletedGames();
+        }
+      }
+
       /// --------------- My upcoming contest => countdown screen navigation ---------------
 
-      if (payload['type'] == 'un_joined_contest' && !isValEmpty(payload['contest'])) {
+      if (payload['type'] == 'un_joined_contest' &&
+          !isValEmpty(payload['contest'])) {
         String contestId = payload['contest'] ?? "";
 
-        GameDetailsModel? gameDetailsModel = await GameRepository.getGameDetailsAPI(contestId: contestId, recurringId: '', isJoined: false);
+        GameDetailsModel? gameDetailsModel =
+            await GameRepository.getGameDetailsAPI(
+                contestId: contestId, recurringId: '', isJoined: false);
 
         if (Get.currentRoute == AppRoutes.gameCountdownScreen) {
           Get.back();
         }
 
-        if (!isValEmpty(LocalStorage.accessToken.value) && Get.currentRoute != AppRoutes.gameCountdownScreen && Get.currentRoute != AppRoutes.gameViewScreen) {
+        if (!isValEmpty(LocalStorage.accessToken.value) &&
+            Get.currentRoute != AppRoutes.gameCountdownScreen &&
+            Get.currentRoute != AppRoutes.gameViewScreen) {
           Get.toNamed(
             AppRoutes.contestDetailsScreen,
             arguments: {
@@ -230,7 +271,7 @@ abstract class NotificationService {
             },
           );
         }
-            }
+      }
 
       /// ----------------------------------- OTHER --------------------------------------
     } catch (e) {
@@ -242,7 +283,8 @@ abstract class NotificationService {
     final DeviceInfoPlugin deviceInfoPlugin = DeviceInfoPlugin();
     try {
       if (Platform.isAndroid) {
-        AndroidDeviceInfo androidDeviceInfo = (await deviceInfoPlugin.androidInfo);
+        AndroidDeviceInfo androidDeviceInfo =
+            (await deviceInfoPlugin.androidInfo);
         await LocalStorage.storeDeviceInfo(
           deviceID: androidDeviceInfo.id,
           deviceTOKEN: fcmToken,
@@ -260,6 +302,51 @@ abstract class NotificationService {
       }
     } catch (k) {
       debugPrint(k.toString());
+    }
+  }
+}
+
+void navigateToCompletedGames() {
+  try {
+    // Ensure MyCompletedMatches is registered
+    Get.put(MyCompletedMatches()); // or Get.lazyPut(() => MyCompletedMatches())
+
+    // Access the BottomNavBarController
+    BottomNavBarController bottomBarCon = Get.find<BottomNavBarController>();
+
+    // Ensure the selected index is updated
+    bottomBarCon.selectedScreenIndex.value = 1; // Navigate to 'My Matches'
+
+    // Access or initialize MyMatchesController
+    MyMatchesController myMatchesCon = Get.put(MyMatchesController());
+
+    // Ensure the tab index is updated
+    myMatchesCon.tabController.index = 2;
+
+    bottomBarCon.selectedScreenIndex.refresh();
+
+    // Trigger the onResume logic if required
+    myGamesScreenOnResumeEvent();
+    // Navigate to the BottomNavBarScreen
+    Get.offNamed(AppRoutes.bottomNavBarScreen);
+  } catch (e) {
+    if (kDebugMode) {
+      if (kDebugMode) {
+        print("Error in navigateToCompl: $e");
+      }
+    }
+  }
+}
+
+void myGamesScreenOnResumeEvent() {
+  printYellow("MyGames Screen OnResume Event");
+  BottomNavBarController bottomBarCon = Get.find<BottomNavBarController>();
+  MyCompletedMatches myCompletedMatches = Get.find<MyCompletedMatches>();
+  MyMatchesController myMatchesCon = Get.find<MyMatchesController>();
+  if (bottomBarCon.selectedScreenIndex.value == 1) {
+    if (isRegistered<MyCompletedMatches>()) {
+      MyCompletedMatches con = Get.find<MyCompletedMatches>();
+      if (myMatchesCon.tabController.index == 2) {}
     }
   }
 }

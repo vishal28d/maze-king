@@ -98,7 +98,7 @@ class ContestDetailsScreen extends StatelessWidget {
                                   onTap: () {
                                     AppDialogs.dashboardCommonDialog(
                                       context,
-                                      dialogTitle: "Canceled Contest",
+                                      dialogTitle: "Cancelled Contest",
                                       descriptionChild: Padding(
                                         padding: const EdgeInsets.symmetric(
                                           horizontal: defaultPadding,

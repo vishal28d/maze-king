@@ -56,7 +56,6 @@ class MyMatchesScreen extends StatelessWidget {
 //   child: Text('Go to My Games - Live'),
 // )
 
-
               ],
               bottomWidget: Container(
                 decoration: BoxDecoration(

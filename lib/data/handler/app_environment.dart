@@ -4,7 +4,7 @@ import '../../exports.dart';
 import '../../utils/enums/common_enums.dart';
 
 class AppEnvironment {
-  static EnvironmentType environmentType = EnvironmentType.development;
+  static EnvironmentType environmentType = EnvironmentType.production;
 
   static String getApiURL() {
     printData(key: "API environment", value: environmentType.name);

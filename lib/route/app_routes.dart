@@ -28,4 +28,6 @@ class AppRoutes {
 
   static String underMaintenanceScreen = '/UNDER-MAINTENANCE-SCREEN';
   static String selectStateScreen = '/SelectStateScreen';
+  
+
 }
