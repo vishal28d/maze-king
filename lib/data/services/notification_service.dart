@@ -235,13 +235,22 @@ abstract class NotificationService {
       }
 
       /// --------------- Navigate to Leaderboard when results are created ---------------
-      if (payload['type'] == 'result' && !isValEmpty(payload['contest'])) {
+      if (payload['type'] == 'completed' && !isValEmpty(payload['contest'])) {
         String contestId = payload['contest'] ?? "";
         String recurringId = payload['recurring'] ?? "";
 
         if (!isValEmpty(LocalStorage.accessToken.value) &&
-            Get.currentRoute != AppRoutes.bottomNavBarScreen) {
-                navigateToCompletedGames();
+            Get.currentRoute != AppRoutes.contestDetailsScreen) {
+                // navigateToCompletedGames();
+                Get.toNamed(
+                          AppRoutes.contestDetailsScreen,
+                          arguments: {
+                            "contestDetailsType": ContestDetailsType.completed,
+                            "contestId": contestId,
+                            "recurringId": recurringId,
+                          },
+                        );
+              
         }
       }
 
@@ -306,36 +315,26 @@ abstract class NotificationService {
   }
 }
 
+
 void navigateToCompletedGames() {
-  try {
-    // Ensure MyCompletedMatches is registered
-    Get.put(MyCompletedMatches()); // or Get.lazyPut(() => MyCompletedMatches())
-
-    // Access the BottomNavBarController
-    BottomNavBarController bottomBarCon = Get.find<BottomNavBarController>();
-
-    // Ensure the selected index is updated
-    bottomBarCon.selectedScreenIndex.value = 1; // Navigate to 'My Matches'
-
-    // Access or initialize MyMatchesController
-    MyMatchesController myMatchesCon = Get.put(MyMatchesController());
-
-    // Ensure the tab index is updated
-    myMatchesCon.tabController.index = 2;
-
-    bottomBarCon.selectedScreenIndex.refresh();
-
-    // Trigger the onResume logic if required
-    myGamesScreenOnResumeEvent();
-    // Navigate to the BottomNavBarScreen
-    Get.offNamed(AppRoutes.bottomNavBarScreen);
-  } catch (e) {
-    if (kDebugMode) {
+   try {
+      // Ensure MyCompletedMatches is registered
+      Get.put(MyCompletedMatches()); // or Get.lazyPut(() => MyCompletedMatches())
+      // Access the BottomNavBarController
+      BottomNavBarController bottomBarCon = Get.find<BottomNavBarController>();
+      // Update the selected index and refresh the value
+      bottomBarCon.selectedScreenIndex.value = 1; // Navigate to 'My Matches'
+      bottomBarCon.selectedScreenIndex.refresh(); // Trigger refresh explicitly
+      // Access or initialize MyMatchesController
+      MyMatchesController myMatchesCon = Get.put(MyMatchesController());
+      // Ensure the tab index is updated
+      myMatchesCon.tabController.index = 2;
+      Get.offNamed(AppRoutes.bottomNavBarScreen);
+    } catch (e) {
       if (kDebugMode) {
         print("Error in navigateToCompl: $e");
       }
     }
-  }
 }
 
 void myGamesScreenOnResumeEvent() {

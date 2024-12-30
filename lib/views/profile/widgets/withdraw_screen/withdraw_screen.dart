@@ -223,7 +223,30 @@ class WithdrawScreen extends StatelessWidget {
                           ),
                         ),
                       ),
-                      28.verticalSpace,
+                       10.verticalSpace,
+
+                      // withdrawal process notification
+                      Center(
+                        child: Container(
+                          margin: const EdgeInsets.only(top: 0),
+                          child: Text(
+                            "The withdrawal process will start in a few days." ,
+                            style: Theme
+                                          .of(context)
+                                          .textTheme
+                                          .titleLarge
+                                          ?.copyWith(
+                                        fontSize: 14.sp,
+                                        color: AppColors.red,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                          
+                          ),
+                        ),
+                      ) , 
+
+                      10.verticalSpace,
+
                       Text(
                         "Send Winnings to",
                         style: Theme
@@ -292,26 +315,6 @@ class WithdrawScreen extends StatelessWidget {
                         ),
                       ) ,
 
-                    // withdrawal process notification
-                      Center(
-                        child: Container(
-                          margin: const EdgeInsets.only(top: 205),
-                          child: Text(
-                            "The withdrawal process will start in a few days." ,
-                            style: Theme
-                                          .of(context)
-                                          .textTheme
-                                          .titleLarge
-                                          ?.copyWith(
-                                        fontSize: 14.sp,
-                                        color: AppColors.red,
-                                        fontWeight: FontWeight.w600,
-                                      ),
-                          
-                          ),
-                        ),
-                      ) , 
-
                     ],
                   ),
                 ),
@@ -344,7 +347,8 @@ class WithdrawScreen extends StatelessWidget {
                 tdsDetailsModel: con.tdsDetailsModel.value,
               );
             },
-            title: "Withdraw",
+            // title: "Withdraw",
+            title: "Withdrawal process will start in a few days",
           ),
         );
       }),

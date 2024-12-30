@@ -88,49 +88,45 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void navigateToCompl() {
-  try {
-    // Ensure MyCompletedMatches is registered
-    Get.put(MyCompletedMatches()); // or Get.lazyPut(() => MyCompletedMatches())
+    try {
+      // Ensure MyCompletedMatches is registered
+      Get.put(
+          MyCompletedMatches()); // or Get.lazyPut(() => MyCompletedMatches())
 
-    // Access the BottomNavBarController
-    BottomNavBarController bottomBarCon = Get.find<BottomNavBarController>();
+      // Access the BottomNavBarController
+      BottomNavBarController bottomBarCon = Get.find<BottomNavBarController>();
 
-    // Ensure the selected index is updated
-    bottomBarCon.selectedScreenIndex.value = 1; // Navigate to 'My Matches'
+      // Update the selected index and refresh the value
+      bottomBarCon.selectedScreenIndex.value = 1; // Navigate to 'My Matches'
+      bottomBarCon.selectedScreenIndex.refresh(); // Trigger refresh explicitly
 
-    // Access or initialize MyMatchesController
-    MyMatchesController myMatchesCon = Get.put(MyMatchesController());
+      // Access or initialize MyMatchesController
+      MyMatchesController myMatchesCon = Get.put(MyMatchesController());
 
-    // Ensure the tab index is updated
-    myMatchesCon.tabController.index = 2;
+      // Ensure the tab index is updated
+      myMatchesCon.tabController.index = 2;
 
-    bottomBarCon.selectedScreenIndex.refresh();
-
-    // Trigger the onResume logic if required
-    myGamesScreenOnResumeEvent();
-    // Navigate to the BottomNavBarScreen
-    Get.offNamed(AppRoutes.bottomNavBarScreen);
-  } catch (e) {
-    if (kDebugMode) {
-      print("Error in navigateToCompl: $e");
+      Get.offNamed(AppRoutes.bottomNavBarScreen);
+    } catch (e) {
+      if (kDebugMode) {
+        print("Error in navigateToCompl: $e");
       }
     }
   }
-
-  void myGamesScreenOnResumeEvent() {
-    printYellow("MyGames Screen OnResume Event");
-    BottomNavBarController bottomBarCon = Get.find<BottomNavBarController>();
-    MyCompletedMatches myCompletedMatches = Get.find<MyCompletedMatches>();
-    MyMatchesController myMatchesCon = Get.find<MyMatchesController>();
-    if (bottomBarCon.selectedScreenIndex.value == 1) {
-      if (isRegistered<MyCompletedMatches>()) {
-        MyCompletedMatches con = Get.find<MyCompletedMatches>();
-        if (myMatchesCon.tabController.index == 2) {
-          setState(() {});
+      
+    void myGamesScreenOnResumeEvent() {
+      printYellow("MyGames Screen OnResume Event");
+      BottomNavBarController bottomBarCon = Get.find<BottomNavBarController>();
+      MyCompletedMatches myCompletedMatches = Get.find<MyCompletedMatches>();
+      MyMatchesController myMatchesCon = Get.find<MyMatchesController>();
+      if (bottomBarCon.selectedScreenIndex.value == 1) {
+        if (isRegistered<MyCompletedMatches>()) {
+          MyCompletedMatches con = Get.find<MyCompletedMatches>();
+          if (myMatchesCon.tabController.index == 2) {}
         }
       }
     }
-  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -147,7 +143,7 @@ class _HomeScreenState extends State<HomeScreen> {
           } else if (b.pin_to_top == true) {
             return 1; // Pin to top moves to the top
           } else {
-            return 0; // No change in order for non-pinned contests
+            return 1; // No change in order for non-pinned contests
           }
         });
 
@@ -227,12 +223,6 @@ class _HomeScreenState extends State<HomeScreen> {
                             homeCon.userGuideLoader.value,
                       ),
 
-                      /// testing
-                      // IconButton(
-                      //     onPressed: () => setState(() {
-                      //           navigateToCompl();
-                      //         }),
-                      //     icon: const Icon(Icons.telegram))
                     ],
                   ),
                 ),

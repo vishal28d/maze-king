@@ -35,7 +35,7 @@ class AddCashScreenController extends GetxController {
     isAddBalDetails.value = !isAddBalDetails.value;
   }
 
-  RxDouble minCashDepositAmount = 50.0.obs;
+  RxDouble minCashDepositAmount = 100.0.obs;
   RxDouble maxCashDepositAmount = 500000.0.obs;
 
   validate() {

@@ -47,9 +47,18 @@ class Leaderboard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Obx(() {
-      con.leaderboardList.sort((a, b) =>
-          (a.rank == null ? double.infinity : a.rank!)
-              .compareTo(b.rank == null ? double.infinity : b.rank!));
+    
+    con.leaderboardList.sort((a, b) {
+      // Check if either `a` or `b` matches the `LocalStorage.userId.value`
+      if (a.userId == LocalStorage.userId.value) return -1; // Place `a` at the top
+      if (b.userId == LocalStorage.userId.value) return 1;  // Place `b` at the top
+
+      // If neither matches, sort by rank
+      num rankA = a.rank ?? double.infinity;
+      num rankB = b.rank ?? double.infinity;
+      return rankA.compareTo(rankB);
+    });
+
 
       return Column(
         children: [
@@ -285,7 +294,7 @@ class Leaderboard extends StatelessWidget {
                                                               child:
 
                                                                   /// Missed Play
-                                                                  ((con.leaderboardList[index].joinStatus == null || con.leaderboardList[index].joinStatus == JoinStatus.none.name) &&
+                                                                  ((con.leaderboardList[index].joinStatus == 'missed' || con.leaderboardList[index].joinStatus == JoinStatus.none.name) &&
                                                                           con.leaderboardList[index].userId ==
                                                                               LocalStorage.userId.value)
                                                                       ? Text(
@@ -306,7 +315,7 @@ class Leaderboard extends StatelessWidget {
                                                                               /// Points calculation details dialog
                                                                               Get.dialog(
                                                                                 PointsCalculationDetailsDialog(
-                                                                                  isNotPlayed: (con.leaderboardList[index].joinStatus == null || con.leaderboardList[index].joinStatus == JoinStatus.none.name),
+                                                                                  isNotPlayed: (con.leaderboardList[index].joinStatus == 'missed' || con.leaderboardList[index].joinStatus == JoinStatus.none.name),
                                                                                   isLoser: (con.leaderboardList[index].winningPercentage ?? 0).isLowerThan(100),
                                                                                   takenTime: (con.leaderboardList[index].winningTime ?? 0),
                                                                                   gamePoints: !isValEmpty(con.leaderboardList[index].winningPercentage) && !isValEmpty(con.leaderboardList[index].totalPercentage) ? (con.leaderboardList[index].winningPercentage! / con.leaderboardList[index].totalPercentage!) * 100 : 0,
@@ -321,7 +330,7 @@ class Leaderboard extends StatelessWidget {
                                                                               Row(
                                                                             mainAxisSize:
                                                                                 MainAxisSize.max,
-                                                                            mainAxisAlignment: (con.leaderboardList[index].joinStatus == null || con.leaderboardList[index].joinStatus == JoinStatus.none.name) && con.leaderboardList[index].userId == LocalStorage.userId.value
+                                                                            mainAxisAlignment: (con.leaderboardList[index].joinStatus == 'missed' || con.leaderboardList[index].joinStatus == JoinStatus.none.name) && con.leaderboardList[index].userId == LocalStorage.userId.value
                                                                                 ? MainAxisAlignment.center
                                                                                 : MainAxisAlignment.end,
                                                                             children: [

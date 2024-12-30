@@ -14,9 +14,14 @@ import '../my_matches/my_matches_controller.dart';
 import '../my_matches/widgets/upcoming/my_upcoming_matches_controller.dart';
 import 'bottombar_controller.dart';
 
-class BottomNavBarScreen extends StatelessWidget {
-  BottomNavBarScreen({super.key});
+class BottomNavBarScreen extends StatefulWidget {
+  const BottomNavBarScreen({super.key});
 
+  @override
+  State<BottomNavBarScreen> createState() => _BottomNavBarScreenState();
+}
+
+class _BottomNavBarScreenState extends State<BottomNavBarScreen> {
   final BottomNavBarController con = Get.put(BottomNavBarController());
 
   @override
@@ -37,13 +42,18 @@ class BottomNavBarScreen extends StatelessWidget {
           bottomNavigationBar: Container(
             // padding: EdgeInsets.only(bottom: MediaQuery.of(context).padding.bottom),
             decoration: BoxDecoration(
-              image: DecorationImage(image: AssetImage(AppAssets.demoBgPNG), fit: BoxFit.cover, opacity: 0.9),
+              image: DecorationImage(
+                  image: AssetImage(AppAssets.demoBgPNG),
+                  fit: BoxFit.cover,
+                  opacity: 0.9),
               // border: Border(
               //     // bottom: BorderSide(color: AppColors.whiteSmoke, width: 1),
               //     ),
             ),
             child: FluidNavBar(
-              selectedTabBgColor: con.selectedScreenIndex.value > 2 ? AppColors.cyanBg : Colors.transparent,
+              selectedTabBgColor: con.selectedScreenIndex.value > 2
+                  ? AppColors.cyanBg
+                  : Colors.transparent,
               animationFactor: 0.5,
               defaultIndex: con.selectedScreenIndex.value,
               style: FluidNavBarStyle(
@@ -93,10 +103,12 @@ class BottomNavBarScreen extends StatelessWidget {
                       MyMatchesController con = Get.find<MyMatchesController>();
 
                       if (isRegistered<MyUpcomingMatchesController>()) {
-                        MyUpcomingMatchesController upCon = Get.find<MyUpcomingMatchesController>();
+                        MyUpcomingMatchesController upCon =
+                            Get.find<MyUpcomingMatchesController>();
 
                         if (con.tabController.index == 0) {
-                          upCon.getContestsAPICall(isPullToRefresh: true, isLoader: upCon.isLoading);
+                          upCon.getContestsAPICall(
+                              isPullToRefresh: true, isLoader: upCon.isLoading);
                         } else {
                           con.tabController.index = 0;
                         }
@@ -135,7 +147,9 @@ class BottomNavBarScreen extends StatelessWidget {
       icon: Container(
         margin: EdgeInsets.only(top: 3.h),
         child: SvgPicture.asset(
-          index == con.selectedScreenIndex.value ? selectedSvgPath : unSelectedSvgPath,
+          index == con.selectedScreenIndex.value
+              ? selectedSvgPath
+              : unSelectedSvgPath,
           // ignore: deprecated_member_use
           // color: index == con.selectedScreenIndex.value ? Theme.of(context).bottomNavigationBarTheme.selectedIconTheme?.color : AppColors.subTextColor(context) /*Theme.of(Get.context!).bottomNavigationBarTheme.unselectedIconTheme?.color*/,
           height: 20.w,
@@ -144,6 +158,4 @@ class BottomNavBarScreen extends StatelessWidget {
       label: label,
     );
   }
-  
-
 }

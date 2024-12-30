@@ -32,7 +32,7 @@ class AppPages {
     ),
     GetPage(
       name: AppRoutes.bottomNavBarScreen,
-      page: () => BottomNavBarScreen(),
+      page: () =>  const BottomNavBarScreen(),
     ),
     GetPage(
       name: AppRoutes.gameCountdownScreen,
